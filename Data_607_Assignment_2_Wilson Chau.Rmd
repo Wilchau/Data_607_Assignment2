@@ -1,0 +1,58 @@
+---
+title: "Data 607 Assignment 2 SQL/R"
+author: "Wilson Chau"
+date: "2022-12-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Introduction
+
+I created a google survey form and received a few data collected. I transfer the csv file into github and got the data cleaned up and started on this assignment.
+```{r}
+library(RMySQL)
+library("dplyr")
+library(tidyverse)
+```
+
+#Converting CSV file to R
+I exported the CSV data and used MySQLWorkbench. I exported the Data into Github. 
+
+```{r}
+mysql <- read.csv("https://raw.githubusercontent.com/AldataSci/Assignment2-607-/main/Homework2%5B607%5D.csv",header=TRUE,sep=",")
+head(mysql)
+```
+
+#Figuring out the average 
+I went through the average ratings and filter out the NULL value and then null values and then I had to make the chr values under Stars into integer values to calculate the average.
+```{r}
+avg_mov <- mysql %>%
+  group_by(movie) %>%
+  filter(Stars != "NULL") %>%
+  summarise(avg= mean(as.integer(Stars)))
+avg_mov
+```
+Once I cleaned the data I went to visualize it
+```{r}
+library(ggplot2)
+ggplot(data=avg_mov, aes(x=movie,y=avg , fill=movie)) + 
+  coord_flip() +
+  geom_bar(stat="identity")
+```
+From this Survey I see Spider-Man No Way Home was the best option to watch.
+
+#Movies not recommended
+
+```{r}
+nul <- mysql %>%
+  group_by(movie) %>%
+  filter(Stars=="NULL") %>%
+  count(Stars,sort=TRUE)
+nul
+library(ggplot2)
+ggplot(data=nul,aes(x=movie,y=n,fill=movie)) +
+  geom_bar(stat="Identity")
+```
